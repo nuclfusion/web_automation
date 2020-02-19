@@ -35,14 +35,22 @@ class CraigslistScraper(object):
             post.text.split("\n")[-1].split(" ", 2)[-1].split("$")[0].strip()
             for post in self.driver.find_elements_by_class_name("result-row")
         ]
-        print(post_title_list)
+        post_title_date = [
+            post.text for post in self.driver.find_elements_by_class_name("result-date")
+        ]
+        post_title_price = [
+            post.text
+            for post in self.driver.find_elements_by_class_name("result-price")
+        ]
 
-    def extract_post_urls(self):
         html_page = urllib.request.urlopen(self.url)
         soup = BeautifulSoup(html_page, "lxml")
         url_list = [
             link["href"] for link in soup.findAll("a", {"class": "result-title hdrlnk"})
         ]
+
+        post_info = zip(post_title_date, post_title_list, post_title_price, url_list)
+        print(list(post_info))
 
     def browser_quit(self):
         self.driver.close()
@@ -51,5 +59,4 @@ class CraigslistScraper(object):
 tampa_bay = CraigslistScraper("tampa", 34684, 100, 25, "dewalt")
 tampa_bay.load_craigslist_url()
 tampa_bay.extract_post_info()
-tampa_bay.extract_post_urls()
 tampa_bay.browser_quit()
