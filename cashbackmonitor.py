@@ -25,13 +25,11 @@ class CashBack(object):
 
     def load_cashbackmonitor(self):
         self.driver.get(self.url)
-        wait = WebDriverWait(self.driver, self.delay)
 
     def browser_quit(self):
         self.driver.close()
 
     def extract_cashback(self):
-
         self.load_cashbackmonitor()
 
         portal_name_raw = self.driver.find_elements_by_xpath('//td[@class="l lo"]')
@@ -43,8 +41,11 @@ class CashBack(object):
         cashback_raw = self.driver.find_elements_by_xpath('//td[@class="l"]//a//span')
         portal_cashback = [cash.text for cash in cashback_raw]
 
-        cashback = zip(portal_name, portal_url, portal_cashback)
-        print(list(cashback))
+        with open(f"cashback_{self.store}.csv", "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Portal Name", "Cash Back", "Portal URL"])
+            for i, j, k in zip(portal_name, portal_cashback, portal_url):
+                writer.writerow([i, j, k])
 
         self.browser_quit()
 
